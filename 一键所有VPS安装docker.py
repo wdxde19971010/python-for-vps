@@ -18,8 +18,8 @@ def update_server(name, hostname, port, username, password):
         client.connect(hostname, port=port, username=username, password=password)
 
         # 执行步骤1: 更新操作
-        print(f" {name} 更新")
-        stdin, stdout, stderr = client.exec_command("apt update -y && apt install -y curl wget sudo socat htop")
+        print(f" {name} 更新系统")
+        stdin, stdout, stderr = client.exec_command("apt update -y")
         
         print(f"正在更新:")
         while not stdout.channel.exit_status_ready():
@@ -36,12 +36,19 @@ def update_server(name, hostname, port, username, password):
 
 
         print(f"{name} 安装 Docker")
-        stdin, stdout, stderr = client.exec_command("wget -qO- https://get.docker.com/ | sh")
+        stdin, stdout, stderr = client.exec_command("apt install docker.io -y")
 
         print(f"正在安装 Docker:")
         while not stdout.channel.exit_status_ready():
             if stdout.channel.recv_ready():
                 print(stdout.channel.recv(1024).decode(), end="")
+
+                
+                
+                
+                
+        print(f"{name} 安装 网心云")
+        stdin, stdout, stderr = client.exec_command("docker run -d --name=wxedge1 --restart=always --privileged --net=host  -e LISTEN_ADDR="0.0.0.0:10001" --tmpfs /run --tmpfs /tmp -e REC＝true -v /wx1:/storage:rw registry.cn-hangzhou.aliyuncs.com/dockerwdx/wx:2.4.3")
 
         # 检查执行状态
         if stderr.channel.recv_exit_status() == 0:
